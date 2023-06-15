@@ -7,6 +7,7 @@ const (
 	FullLifecycleGate               = "FullLifecycleAPI"
 	CheckpointEnabledEnvVar         = "CHECKPOINT_ENABLED"
 	UseNewWorkflowsEnvVar           = "USE_NEW_WORKFLOWS"
+	UseControllerForWorkloadCli     = "USE_CONTROLLER_FOR_WORKLOAD_CLI"
 
 	ExperimentalSelfManagedClusterUpgradeEnvVar = "EXP_SELF_MANAGED_API_UPGRADE"
 	experimentalSelfManagedClusterUpgradeGate   = "ExpSelfManagedAPIUpgrade"
@@ -66,5 +67,12 @@ func UseNewWorkflows() Feature {
 	return Feature{
 		Name:     "Use new workflow logic for cluster management operations",
 		IsActive: globalFeatures.isActiveForEnvVar(UseNewWorkflowsEnvVar),
+	}
+}
+
+func UseControllerViaCLIWorkflow() Feature {
+	return Feature{
+		Name:     "Use new workflow logic for workload cluster creation leveraging controller via CLI",
+		IsActive: globalFeatures.isActiveForEnvVar(UseControllerForWorkloadCli),
 	}
 }
