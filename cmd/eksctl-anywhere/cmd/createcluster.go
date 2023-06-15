@@ -3,7 +3,8 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"strings"
+	"log"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -17,7 +18,10 @@ import (
 	"github.com/aws/eks-anywhere/pkg/features"
 	"github.com/aws/eks-anywhere/pkg/kubeconfig"
 	"github.com/aws/eks-anywhere/pkg/logger"
+<<<<<<< HEAD
 	"github.com/aws/eks-anywhere/pkg/providers/tinkerbell/hardware"
+=======
+>>>>>>> de79e475 (POC Workload creation CLI via controller)
 	"github.com/aws/eks-anywhere/pkg/types"
 	"github.com/aws/eks-anywhere/pkg/validations"
 	"github.com/aws/eks-anywhere/pkg/validations/createvalidations"
@@ -252,6 +256,19 @@ func (cc *createClusterOptions) createCluster(cmd *cobra.Command, _ []string) er
 		}
 
 		err = wflw.Run(ctx)
+	} else if features.UseControllerViaCLIWorkflow().IsActive() && clusterConfig.IsManaged() {
+		
+		eksaSpec, _ := os.ReadFile(cc.fileName)
+		logger.Info("POC Inside controller via CLI workflow")
+
+		createWorkloadCluster := workflows.NewCreateWorkload(
+			deps.Provider,
+			deps.ClusterManager,
+			deps.GitOpsFlux,
+			deps.Writer,
+		)
+		err = createWorkloadCluster.Run(ctx, clusterSpec, createValidations, eksaSpec)
+
 	} else {
 		err = createCluster.Run(ctx, clusterSpec, createValidations, cc.forceClean)
 	}
