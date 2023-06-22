@@ -152,6 +152,12 @@ func (cc *createClusterOptions) createCluster(cmd *cobra.Command, _ []string) er
 		return err
 	}
 
+	skipAnnotation := map[string]string{"skip-ip-check": "true"}
+
+	if cc.skipIpCheck {
+		clusterSpec.Config.Cluster.ObjectMeta.SetAnnotations(skipAnnotation)
+	}
+
 	if err := validations.ValidateAuthenticationForRegistryMirror(clusterSpec); err != nil {
 		return err
 	}
