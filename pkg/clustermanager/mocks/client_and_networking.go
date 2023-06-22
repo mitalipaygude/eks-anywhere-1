@@ -773,6 +773,48 @@ func (mr *MockClusterClientMockRecorder) WaitForDeployment(arg0, arg1, arg2, arg
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForDeployment", reflect.TypeOf((*MockClusterClient)(nil).WaitForDeployment), arg0, arg1, arg2, arg3, arg4, arg5)
 }
 
+// WaitForEKSAClusterReady mocks base method.
+func (m *MockClusterClient) WaitForEKSAClusterReady(arg0 context.Context, arg1 *types.Cluster, arg2, arg3 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WaitForEKSAClusterReady", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WaitForEKSAClusterReady indicates an expected call of WaitForEKSAClusterReady.
+func (mr *MockClusterClientMockRecorder) WaitForEKSAClusterReady(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForEKSAClusterReady", reflect.TypeOf((*MockClusterClient)(nil).WaitForEKSAClusterReady), arg0, arg1, arg2, arg3)
+}
+
+// WaitForEKSAControlPlaneAvailable mocks base method.
+func (m *MockClusterClient) WaitForEKSAControlPlaneAvailable(arg0 context.Context, arg1 *types.Cluster, arg2, arg3 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WaitForEKSAControlPlaneAvailable", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WaitForEKSAControlPlaneAvailable indicates an expected call of WaitForEKSAControlPlaneAvailable.
+func (mr *MockClusterClientMockRecorder) WaitForEKSAControlPlaneAvailable(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForEKSAControlPlaneAvailable", reflect.TypeOf((*MockClusterClient)(nil).WaitForEKSAControlPlaneAvailable), arg0, arg1, arg2, arg3)
+}
+
+// WaitForEKSAControlPlaneReady mocks base method.
+func (m *MockClusterClient) WaitForEKSAControlPlaneReady(arg0 context.Context, arg1 *types.Cluster, arg2, arg3 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WaitForEKSAControlPlaneReady", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WaitForEKSAControlPlaneReady indicates an expected call of WaitForEKSAControlPlaneReady.
+func (mr *MockClusterClientMockRecorder) WaitForEKSAControlPlaneReady(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForEKSAControlPlaneReady", reflect.TypeOf((*MockClusterClient)(nil).WaitForEKSAControlPlaneReady), arg0, arg1, arg2, arg3)
+}
+
 // WaitForManagedExternalEtcdNotReady mocks base method.
 func (m *MockClusterClient) WaitForManagedExternalEtcdNotReady(arg0 context.Context, arg1 *types.Cluster, arg2, arg3 string) error {
 	m.ctrl.T.Helper()
