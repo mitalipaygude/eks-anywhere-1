@@ -117,6 +117,7 @@ type ClusterClient interface {
 	WaitForControlPlaneNotReady(ctx context.Context, cluster *types.Cluster, timeout string, newClusterName string) error
 	WaitForManagedExternalEtcdReady(ctx context.Context, cluster *types.Cluster, timeout string, newClusterName string) error
 	WaitForManagedExternalEtcdNotReady(ctx context.Context, cluster *types.Cluster, timeout string, newClusterName string) error
+	WaitForEKSANodesReady(ctx context.Context, cluster *types.Cluster, timeout string, newClusterName string) error
 	GetWorkloadKubeconfig(ctx context.Context, clusterName string, cluster *types.Cluster) ([]byte, error)
 	GetEksaGitOpsConfig(ctx context.Context, gitOpsConfigName string, kubeconfigFile string, namespace string) (*v1alpha1.GitOpsConfig, error)
 	GetEksaFluxConfig(ctx context.Context, fluxConfigName string, kubeconfigFile string, namespace string) (*v1alpha1.FluxConfig, error)
@@ -454,6 +455,10 @@ func (c *ClusterManager) CreateWorkloadCluster(ctx context.Context, managementCl
 	return workloadCluster, nil
 }
 
+//------------------------------------------------------POC--------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------
+
 func (c *ClusterManager) CreatePOCWorkloadCluster(ctx context.Context, managementCluster *types.Cluster, clusterSpec *cluster.Spec, provider providers.Provider) (*types.Cluster, error) {
 	clusterName := clusterSpec.Cluster.Name
 
@@ -474,20 +479,6 @@ func (c *ClusterManager) CreatePOCWorkloadCluster(ctx context.Context, managemen
 		return nil, fmt.Errorf("POC applying workload cluster spec: %v", err)
 	}
 
-	// if clusterSpec.Cluster.Spec.ExternalEtcdConfiguration != nil {
-	// 	logger.V(3).Info("Waiting for external etcd to be ready", "cluster", clusterSpec.Cluster.Name)
-	// 	err := c.clusterClient.WaitForManagedExternalEtcdReady(
-	// 		ctx,
-	// 		managementCluster,
-	// 		c.externalEtcdWaitTimeout.String(),
-	// 		clusterSpec.Cluster.Name,
-	// 	)
-	// 	if err != nil {
-	// 		return nil, fmt.Errorf("waiting for external etcd for workload cluster to be ready: %v", err)
-	// 	}
-	// 	logger.V(3).Info("External etcd is ready")
-	// }
-
 	logger.V(3).Info("POC Waiting for control plane to be initialized")
 	err = c.clusterClient.WaitForEKSAControlPlaneAvailable(
 		ctx,
@@ -496,21 +487,12 @@ func (c *ClusterManager) CreatePOCWorkloadCluster(ctx context.Context, managemen
 		clusterSpec.Cluster.Name,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("waiting for control plane to be ready: %v", err)
+		return nil, fmt.Errorf("waiting for control plane to be initialized: %v", err)
 	}
 
-	logger.V(3).Info("POC Waiting for control plane to be ready")
-	err = c.clusterClient.WaitForEKSAControlPlaneReady(
-		ctx,
-		managementCluster,
-		c.controlPlaneWaitTimeout.String(),
-		clusterSpec.Cluster.Name,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("waiting for control plane to be ready: %v", err)
-	}
-
-	logger.V(3).Info("POC Control plane is ready")
+	logger.V(3).Info("---------------------------------\n")
+	logger.V(3).Info("POC Control plane has been initialized\n")
+	logger.V(3).Info("---------------------------------\n")
 
 	logger.V(3).Info("POC Waiting for workload kubeconfig generation", "cluster", clusterName)
 
@@ -541,7 +523,7 @@ func (c *ClusterManager) CreatePOCWorkloadCluster(ctx context.Context, managemen
 	}
 	workloadCluster.KubeconfigFile = kubeconfigFile
 
-	logger.V(3).Info("POC Waiting for cluster to be ready")
+	logger.V(3).Info("POC Waiting for control plane to be ready")
 	err = c.clusterClient.WaitForEKSAControlPlaneReady(
 		ctx,
 		managementCluster,
@@ -552,8 +534,46 @@ func (c *ClusterManager) CreatePOCWorkloadCluster(ctx context.Context, managemen
 		return nil, fmt.Errorf("waiting for control plane to be ready: %v", err)
 	}
 
+	logger.V(3).Info("---------------------------------\n")
+	logger.V(3).Info("POC Control plane is ready\n")
+	logger.V(3).Info("---------------------------------\n")
+
+	logger.V(3).Info("POC Waiting for nodes to be ready")
+	err = c.clusterClient.WaitForEKSANodesReady(
+		ctx,
+		managementCluster,
+		c.clusterWaitTimeout.String(),
+		clusterSpec.Cluster.Name,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("waiting for nodes to be ready: %v", err)
+	}
+
+	logger.V(3).Info("---------------------------------\n")
+	logger.V(3).Info("POC Workers are ready\n")
+	logger.V(3).Info("---------------------------------\n")
+
+	logger.V(3).Info("POC Waiting for cluster to be ready")
+	err = c.clusterClient.WaitForEKSAControlPlaneReady(
+		ctx,
+		managementCluster,
+		c.clusterWaitTimeout.String(),
+		clusterSpec.Cluster.Name,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("waiting for cluster be ready: %v", err)
+	}
+
+	logger.V(3).Info("---------------------------------\n")
+	logger.V(3).Info("POC Cluster is ready\n")
+	logger.V(3).Info("---------------------------------\n")
+
 	return workloadCluster, nil
 }
+
+//-----------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------POC--------------------------------------------------------
 
 func (c *ClusterManager) waitUntilControlPlaneAvailable(
 	ctx context.Context,

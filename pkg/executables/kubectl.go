@@ -386,6 +386,10 @@ func (k *Kubectl) WaitForEKSAControlPlaneReady(ctx context.Context, cluster *typ
 	return k.Wait(ctx, cluster.KubeconfigFile, timeout, "ControlPlaneReady", fmt.Sprintf("%s/%s", eksaClusterResourceType, newClusterName), constants.DefaultNamespace)
 }
 
+func (k *Kubectl) WaitForEKSANodesReady(ctx context.Context, cluster *types.Cluster, timeout string, newClusterName string) error {
+	return k.Wait(ctx, cluster.KubeconfigFile, timeout, "WorkersReady", fmt.Sprintf("%s/%s", eksaClusterResourceType, newClusterName), constants.DefaultNamespace)
+}
+
 // WaitForControlPlaneAvailable blocks until the first control plane is available.
 func (k *Kubectl) WaitForControlPlaneAvailable(ctx context.Context, cluster *types.Cluster, timeout string, newClusterName string) error {
 	return k.Wait(ctx, cluster.KubeconfigFile, timeout, "ControlPlaneInitialized", fmt.Sprintf("%s/%s", capiClustersResourceType, newClusterName), constants.EksaSystemNamespace)
