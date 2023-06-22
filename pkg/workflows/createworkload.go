@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/aws/eks-anywhere/pkg/cluster"
-	"github.com/aws/eks-anywhere/pkg/types"
 	"github.com/aws/eks-anywhere/pkg/clustermarshaller"
+	"github.com/aws/eks-anywhere/pkg/types"
 	// "github.com/aws/eks-anywhere/pkg/constants"
 	"github.com/aws/eks-anywhere/pkg/filewriter"
 	"github.com/aws/eks-anywhere/pkg/logger"
@@ -19,11 +19,11 @@ import (
 )
 
 type CreateWorkload struct {
-	provider         providers.Provider
-	clusterManager   interfaces.ClusterManager
-	gitOpsManager    interfaces.GitOpsManager
-	writer           filewriter.FileWriter
-	eksaSpec         []byte
+	provider       providers.Provider
+	clusterManager interfaces.ClusterManager
+	gitOpsManager  interfaces.GitOpsManager
+	writer         filewriter.FileWriter
+	eksaSpec       []byte
 }
 
 func NewCreateWorkload(provider providers.Provider,
@@ -31,23 +31,22 @@ func NewCreateWorkload(provider providers.Provider,
 	writer filewriter.FileWriter,
 ) *CreateWorkload {
 	return &CreateWorkload{
-		provider:         provider,
-		clusterManager:   clusterManager,
-		gitOpsManager:    gitOpsManager,
-		writer:           writer,
+		provider:       provider,
+		clusterManager: clusterManager,
+		gitOpsManager:  gitOpsManager,
+		writer:         writer,
 	}
 }
 
 func (c *CreateWorkload) Run(ctx context.Context, clusterSpec *cluster.Spec, validator interfaces.Validator, eksaSpec []byte) error {
-
 	logger.Info("POC New workflow creating workload cluster using the controller")
 	commandContext := &task.CommandContext{
-		Provider:         c.provider,
-		ClusterManager:   c.clusterManager,
-		GitOpsManager:    c.gitOpsManager,
-		ClusterSpec:      clusterSpec,
-		Writer:           c.writer,
-		Validations:      validator,
+		Provider:          c.provider,
+		ClusterManager:    c.clusterManager,
+		GitOpsManager:     c.gitOpsManager,
+		ClusterSpec:       clusterSpec,
+		Writer:            c.writer,
+		Validations:       validator,
 		ManagementCluster: clusterSpec.ManagementCluster,
 	}
 
@@ -163,4 +162,3 @@ func (s *WriteWorkloadClusterConfigTask) Restore(ctx context.Context, commandCon
 func (s *WriteWorkloadClusterConfigTask) Checkpoint() *task.CompletedTask {
 	return nil
 }
-

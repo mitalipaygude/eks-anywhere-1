@@ -109,6 +109,7 @@ type ClusterClient interface {
 	BackupManagement(ctx context.Context, cluster *types.Cluster, managementStatePath, clusterName string) error
 	MoveManagement(ctx context.Context, from, target *types.Cluster, clusterName string) error
 	WaitForClusterReady(ctx context.Context, cluster *types.Cluster, timeout string, clusterName string) error
+	WaitForEKSAClusterReady(ctx context.Context, cluster *types.Cluster, timeout string, clusterName string) error
 	WaitForControlPlaneAvailable(ctx context.Context, cluster *types.Cluster, timeout string, newClusterName string) error
 	WaitForEKSAControlPlaneAvailable(ctx context.Context, cluster *types.Cluster, timeout string, newClusterName string) error
 	WaitForControlPlaneReady(ctx context.Context, cluster *types.Cluster, timeout string, newClusterName string) error
@@ -540,9 +541,8 @@ func (c *ClusterManager) CreatePOCWorkloadCluster(ctx context.Context, managemen
 	}
 	workloadCluster.KubeconfigFile = kubeconfigFile
 
-
-	logger.V(3).Info("POC Waiting for control plane to be available")
-	err = c.clusterClient.WaitForEKSAControlPlaneAvailable(
+	logger.V(3).Info("POC Waiting for cluster to be ready")
+	err = c.clusterClient.WaitForEKSAControlPlaneReady(
 		ctx,
 		managementCluster,
 		c.controlPlaneWaitTimeout.String(),

@@ -195,6 +195,21 @@ func (mr *MockClusterManagerMockRecorder) CreateEKSAResources(arg0, arg1, arg2, 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEKSAResources", reflect.TypeOf((*MockClusterManager)(nil).CreateEKSAResources), arg0, arg1, arg2, arg3, arg4)
 }
 
+// CreatePOCWorkloadCluster mocks base method.
+func (m *MockClusterManager) CreatePOCWorkloadCluster(arg0 context.Context, arg1 *types.Cluster, arg2 *cluster.Spec, arg3 providers.Provider) (*types.Cluster, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreatePOCWorkloadCluster", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(*types.Cluster)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreatePOCWorkloadCluster indicates an expected call of CreatePOCWorkloadCluster.
+func (mr *MockClusterManagerMockRecorder) CreatePOCWorkloadCluster(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePOCWorkloadCluster", reflect.TypeOf((*MockClusterManager)(nil).CreatePOCWorkloadCluster), arg0, arg1, arg2, arg3)
+}
+
 // CreateWorkloadCluster mocks base method.
 func (m *MockClusterManager) CreateWorkloadCluster(arg0 context.Context, arg1 *types.Cluster, arg2 *cluster.Spec, arg3 providers.Provider) (*types.Cluster, error) {
 	m.ctrl.T.Helper()
