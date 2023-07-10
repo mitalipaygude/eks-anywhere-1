@@ -5,6 +5,8 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/yaml"
+
+	"github.com/aws/eks-anywhere/pkg/clients/kubernetes"
 )
 
 const objectSeparator string = "\n---\n"
@@ -27,6 +29,19 @@ func AppendYamlResources(resources ...[]byte) []byte {
 }
 
 func ObjectsToYaml(objs ...runtime.Object) ([]byte, error) {
+	r := [][]byte{}
+	for _, o := range objs {
+		b, err := yaml.Marshal(o)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal object: %v", err)
+		}
+		r = append(r, b)
+	}
+	return AppendYamlResources(r...), nil
+}
+
+// KubernetesObjectsToYaml converts kubernetes objects to yaml.
+func KubernetesObjectsToYaml(objs ...kubernetes.Object) ([]byte, error) {
 	r := [][]byte{}
 	for _, o := range objs {
 		b, err := yaml.Marshal(o)
