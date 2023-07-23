@@ -111,8 +111,6 @@ type deleteBootstrapClusterTask struct {
 	*CollectDiagnosticsTask
 }
 
-type updateClusterAndGitResources struct{}
-
 // reconcileClusterDefinitions updates all the places that have a cluster definition to follow the cluster config provided to this workflow:
 // the eks-a objects in the management cluster and the cluster config in the git repo if GitOps is enabled. It also resumes the eks-a controller
 // manager and GitOps reconciliations.
@@ -535,6 +533,13 @@ func (s *upgradeWorkloadClusterTask) Run(ctx context.Context, commandContext *ta
 		return &CollectDiagnosticsTask{}
 	}
 
+	logger.V(4).Info("Updating machine health checks on cluster")
+	err = commandContext.ClusterManager.UpdateMachineHealthChecks(ctx, commandContext.ClusterSpec, commandContext.WorkloadCluster)
+	if err != nil {
+		commandContext.SetError(err)
+		return &CollectDiagnosticsTask{}
+	}
+
 	if err := commandContext.ClusterUpgrader.CleanupAfterUpgrade(
 		ctx,
 		commandContext.ClusterSpec,
@@ -655,6 +660,7 @@ func (s *reconcileClusterDefinitions) Run(ctx context.Context, commandContext *t
 		commandContext.SetError(err)
 		return &writeClusterConfigTask{}
 	}
+
 	if !s.eksaSpecDiff {
 		return nil
 	}
