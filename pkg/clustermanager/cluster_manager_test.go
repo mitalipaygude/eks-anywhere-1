@@ -2537,6 +2537,20 @@ func TestClusterManagerClusterSpecChangedClusterChanged(t *testing.T) {
 	assert.True(t, diff, "Changes should have been detected")
 }
 
+func TestClusterManagerClusterSpecChangedMachineHealthCheckChanged(t *testing.T) {
+	tt := newSpecChangedTest(t)
+	tt.newClusterConfig.Spec.MachineHealthCheck = &v1alpha1.MachineHealthCheck{
+		NodeStartupTimeout:      "10s",
+		UnhealthyMachineTimeout: "20s",
+	}
+
+	tt.mocks.client.EXPECT().GetEksaCluster(tt.ctx, tt.cluster, tt.clusterSpec.Cluster.Name).Return(tt.oldClusterConfig, nil)
+
+	diff, err := tt.clusterManager.EKSAClusterSpecChanged(tt.ctx, tt.cluster, tt.clusterSpec)
+	assert.Nil(t, err, "Error should be nil")
+	assert.True(t, diff, "Changes should have been detected")
+}
+
 func TestClusterManagerClusterSpecChangedEksDReleaseChanged(t *testing.T) {
 	tt := newSpecChangedTest(t)
 	tt.clusterSpec.VersionsBundle.EksD.Name = "kubernetes-1-19-eks-5"
