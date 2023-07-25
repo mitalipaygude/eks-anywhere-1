@@ -432,9 +432,9 @@ func (c *upgradeTestSetup) expectPreCoreComponentsUpgrade() {
 	c.provider.EXPECT().PreCoreComponentsUpgrade(gomock.Any(), gomock.Any(), gomock.Any())
 }
 
-func (c *upgradeTestSetup) expectUpdateMHC() {
+func (c *upgradeTestSetup) expectUpdateMHC(cluster *types.Cluster) {
 	c.clusterManager.EXPECT().UpdateMachineHealthChecks(
-		c.ctx, c.newClusterSpec, c.workloadCluster,
+		c.ctx, c.newClusterSpec, cluster,
 	)
 }
 
@@ -523,7 +523,7 @@ func TestUpgradeRunSuccess(t *testing.T) {
 	test.expectResumeGitOpsReconcile(test.workloadCluster)
 	test.expectPostBootstrapDeleteForUpgrade()
 	test.expectPreCoreComponentsUpgrade()
-	test.expectUpdateMHC()
+	test.expectUpdateMHC(test.bootstrapCluster)
 
 	err := test.run()
 	if err != nil {
@@ -560,7 +560,7 @@ func TestUpgradeRunSuccessForceCleanup(t *testing.T) {
 	test.expectResumeGitOpsReconcile(test.workloadCluster)
 	test.expectPostBootstrapDeleteForUpgrade()
 	test.expectPreCoreComponentsUpgrade()
-	test.expectUpdateMHC()
+	test.expectUpdateMHC(test.bootstrapCluster)
 
 	err := test.run()
 	if err != nil {
@@ -595,7 +595,7 @@ func TestUpgradeRunProviderNeedsUpgradeSuccess(t *testing.T) {
 	test.expectResumeGitOpsReconcile(test.workloadCluster)
 	test.expectPostBootstrapDeleteForUpgrade()
 	test.expectPreCoreComponentsUpgrade()
-	test.expectUpdateMHC()
+	test.expectUpdateMHC(test.bootstrapCluster)
 
 	err := test.run()
 	if err != nil {
@@ -703,7 +703,7 @@ func TestUpgradeWorkloadRunSuccess(t *testing.T) {
 	test.expectResumeGitOpsReconcile(test.managementCluster)
 	test.expectUpgradeWorkload(test.managementCluster, test.workloadCluster)
 	test.expectPreCoreComponentsUpgrade()
-	test.expectUpdateMHC()
+	test.expectUpdateMHC(test.managementCluster)
 
 	err := test.run()
 	if err != nil {
@@ -771,7 +771,7 @@ func TestUpgradeWithCheckpointSecondRunSuccess(t *testing.T) {
 	test2.expectForceReconcileGitRepo(test2.workloadCluster)
 	test2.expectResumeGitOpsReconcile(test2.workloadCluster)
 	test2.expectPostBootstrapDeleteForUpgrade()
-	test2.expectUpdateMHC()
+	test2.expectUpdateMHC(test.bootstrapCluster)
 
 	err = test2.run()
 	if err != nil {

@@ -10,7 +10,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/validation"
@@ -185,7 +184,6 @@ var clusterConfigValidations = []func(*Cluster) error{
 	validateCPUpgradeRolloutStrategy,
 	validateControlPlaneLabels,
 	validatePackageControllerConfiguration,
-	validateMachineHealthChecks,
 }
 
 // GetClusterConfig parses a Cluster object from a multiobject yaml file in disk
@@ -843,28 +841,5 @@ func validatePackageControllerConfiguration(clusterConfig *Cluster) error {
 			}
 		}
 	}
-	return nil
-}
-
-func validateMachineHealthChecks(cluster *Cluster) error {
-	if cluster.Spec.MachineHealthCheck == nil {
-		return nil
-	}
-
-	mhc := cluster.Spec.MachineHealthCheck
-	if len(mhc.NodeStartupTimeout) != 0 {
-		_, err := time.ParseDuration(mhc.NodeStartupTimeout)
-		if err != nil {
-			return fmt.Errorf(parseDurationErrorTemplate, "nodeStartupTimeout", err)
-		}
-	}
-
-	if len(mhc.UnhealthyMachineTimeout) != 0 {
-		_, err := time.ParseDuration(mhc.UnhealthyMachineTimeout)
-		if err != nil {
-			return fmt.Errorf(parseDurationErrorTemplate, "unhealthyMachineTimeout", err)
-		}
-	}
-
 	return nil
 }

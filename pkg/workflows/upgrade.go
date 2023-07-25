@@ -534,7 +534,7 @@ func (s *upgradeWorkloadClusterTask) Run(ctx context.Context, commandContext *ta
 	}
 
 	logger.V(4).Info("Updating machine health checks on cluster")
-	err = commandContext.ClusterManager.UpdateMachineHealthChecks(ctx, commandContext.ClusterSpec, commandContext.WorkloadCluster)
+	err = commandContext.ClusterManager.UpdateMachineHealthChecks(ctx, commandContext.ClusterSpec, commandContext.ManagementCluster)
 	if err != nil {
 		commandContext.SetError(err)
 		return &CollectDiagnosticsTask{}
