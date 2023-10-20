@@ -3,7 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"log"
+	"strings"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -18,10 +18,7 @@ import (
 	"github.com/aws/eks-anywhere/pkg/features"
 	"github.com/aws/eks-anywhere/pkg/kubeconfig"
 	"github.com/aws/eks-anywhere/pkg/logger"
-<<<<<<< HEAD
 	"github.com/aws/eks-anywhere/pkg/providers/tinkerbell/hardware"
-=======
->>>>>>> de79e475 (POC Workload creation CLI via controller)
 	"github.com/aws/eks-anywhere/pkg/types"
 	"github.com/aws/eks-anywhere/pkg/validations"
 	"github.com/aws/eks-anywhere/pkg/validations/createvalidations"
