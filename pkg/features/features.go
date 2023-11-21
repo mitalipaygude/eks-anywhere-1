@@ -2,10 +2,10 @@ package features
 
 // These are environment variables used as flags to enable/disable features.
 const (
-	CloudStackKubeVipDisabledEnvVar = "CLOUDSTACK_KUBE_VIP_DISABLED"
-	CheckpointEnabledEnvVar         = "CHECKPOINT_ENABLED"
-	UseNewWorkflowsEnvVar           = "USE_NEW_WORKFLOWS"
-	UseControllerForWorkloadCli     = "USE_CONTROLLER_FOR_WORKLOAD_CLI"
+	CloudStackKubeVipDisabledEnvVar             = "CLOUDSTACK_KUBE_VIP_DISABLED"
+	CheckpointEnabledEnvVar                     = "CHECKPOINT_ENABLED"
+	UseNewWorkflowsEnvVar                       = "USE_NEW_WORKFLOWS"
+	UseControllerForWorkloadCli                 = "USE_CONTROLLER_FOR_WORKLOAD_CLI"
 	ExperimentalSelfManagedClusterUpgradeEnvVar = "EXP_SELF_MANAGED_API_UPGRADE"
 	ExperimentalSelfManagedClusterUpgradeGate   = "ExpSelfManagedAPIUpgrade"
 )

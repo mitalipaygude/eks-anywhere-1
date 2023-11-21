@@ -86,3 +86,8 @@ type PackageInstaller interface {
 type ClusterUpgrader interface {
 	Run(ctx context.Context, spec *cluster.Spec, managementCluster types.Cluster) error
 }
+
+// ClusterCreater creates the cluster and waits until it's ready.
+type ClusterCreater interface {
+	Run(ctx context.Context, spec *cluster.Spec, managementCluster types.Cluster) error
+}
