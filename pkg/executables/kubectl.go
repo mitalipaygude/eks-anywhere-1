@@ -374,30 +374,13 @@ func (k *Kubectl) WaitForClusterReady(ctx context.Context, cluster *types.Cluste
 	return k.Wait(ctx, cluster.KubeconfigFile, timeout, "Ready", fmt.Sprintf("%s/%s", capiClustersResourceType, clusterName), constants.EksaSystemNamespace)
 }
 
-func (k *Kubectl) WaitForEKSAClusterReady(ctx context.Context, cluster *types.Cluster, timeout string, clusterName string) error {
-	return k.Wait(ctx, cluster.KubeconfigFile, timeout, "Ready", fmt.Sprintf("%s/%s", eksaClusterResourceType, clusterName), constants.DefaultNamespace)
-}
-
 func (k *Kubectl) WaitForControlPlaneReady(ctx context.Context, cluster *types.Cluster, timeout string, newClusterName string) error {
 	return k.Wait(ctx, cluster.KubeconfigFile, timeout, "ControlPlaneReady", fmt.Sprintf("%s/%s", capiClustersResourceType, newClusterName), constants.EksaSystemNamespace)
-}
-
-func (k *Kubectl) WaitForEKSAControlPlaneReady(ctx context.Context, cluster *types.Cluster, timeout string, newClusterName string) error {
-	return k.Wait(ctx, cluster.KubeconfigFile, timeout, "ControlPlaneReady", fmt.Sprintf("%s/%s", eksaClusterResourceType, newClusterName), constants.DefaultNamespace)
-}
-
-func (k *Kubectl) WaitForEKSANodesReady(ctx context.Context, cluster *types.Cluster, timeout string, newClusterName string) error {
-	return k.Wait(ctx, cluster.KubeconfigFile, timeout, "WorkersReady", fmt.Sprintf("%s/%s", eksaClusterResourceType, newClusterName), constants.DefaultNamespace)
 }
 
 // WaitForControlPlaneAvailable blocks until the first control plane is available.
 func (k *Kubectl) WaitForControlPlaneAvailable(ctx context.Context, cluster *types.Cluster, timeout string, newClusterName string) error {
 	return k.Wait(ctx, cluster.KubeconfigFile, timeout, "ControlPlaneInitialized", fmt.Sprintf("%s/%s", capiClustersResourceType, newClusterName), constants.EksaSystemNamespace)
-}
-
-// WaitForControlPlaneAvailable blocks until the first control plane is available for EKSA cluster.
-func (k *Kubectl) WaitForEKSAControlPlaneAvailable(ctx context.Context, cluster *types.Cluster, timeout string, newClusterName string) error {
-	return k.Wait(ctx, cluster.KubeconfigFile, timeout, "ControlPlaneInitialized", fmt.Sprintf("%s/%s", eksaClusterResourceType, newClusterName), constants.DefaultNamespace)
 }
 
 func (k *Kubectl) WaitForControlPlaneNotReady(ctx context.Context, cluster *types.Cluster, timeout string, newClusterName string) error {

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -24,6 +23,7 @@ import (
 	"github.com/aws/eks-anywhere/pkg/validations/createvalidations"
 	"github.com/aws/eks-anywhere/pkg/workflow/management"
 	"github.com/aws/eks-anywhere/pkg/workflows"
+	"github.com/aws/eks-anywhere/pkg/workflows/workload"
 )
 
 type createClusterOptions struct {
@@ -193,7 +193,8 @@ func (cc *createClusterOptions) createCluster(cmd *cobra.Command, _ []string) er
 		WithEksdInstaller().
 		WithPackageInstaller(clusterSpec, cc.installPackages, cc.managementKubeconfig).
 		WithValidatorClients().
-		WithCreateClusterDefaulter(createCLIConfig)
+		WithCreateClusterDefaulter(createCLIConfig).
+		WithClusterApplier()
 
 	if cc.timeoutOptions.noTimeouts {
 		factory.WithNoTimeouts()
@@ -261,16 +262,19 @@ func (cc *createClusterOptions) createCluster(cmd *cobra.Command, _ []string) er
 		err = wflw.Run(ctx)
 	} else if features.UseControllerViaCLIWorkflow().IsActive() && clusterConfig.IsManaged() {
 
-		eksaSpec, _ := os.ReadFile(cc.fileName)
+		logger.Info("-----------------------------------------------------")
 		logger.Info("POC Inside controller via CLI workflow")
 
-		createWorkloadCluster := workflows.NewCreateWorkload(
+		createWorkloadCluster := workload.NewCreateWorkload(
 			deps.Provider,
 			deps.ClusterManager,
 			deps.GitOpsFlux,
 			deps.Writer,
+			deps.ClusterApplier,
+			deps.EksdInstaller,
+			deps.PackageInstaller,
 		)
-		err = createWorkloadCluster.Run(ctx, clusterSpec, createValidations, eksaSpec)
+		err = createWorkloadCluster.Run(ctx, clusterSpec, createValidations)
 
 	} else {
 		err = createCluster.Run(ctx, clusterSpec, createValidations, cc.forceClean)
