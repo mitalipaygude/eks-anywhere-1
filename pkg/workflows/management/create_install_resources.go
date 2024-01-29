@@ -17,7 +17,7 @@ func (s *installResourcesOnManagementTask) Run(ctx context.Context, commandConte
 		commandContext.SetError(err)
 		return &workflows.CollectDiagnosticsTask{}
 	}
-	return nil
+	return &moveClusterManagementTask{}
 }
 
 func (s *installResourcesOnManagementTask) Name() string {
