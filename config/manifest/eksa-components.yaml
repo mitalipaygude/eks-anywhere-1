@@ -7620,7 +7620,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.uid
-        image: public.ecr.aws/l0g8r8j6/eks-anywhere-cluster-controller:v0.0.0-eks-a-v0.0.0-dev-build.251
+        image: public.ecr.aws/c0x2h9e2/eks-a-controller-manager:kubelet17
         imagePullPolicy: Always
         livenessProbe:
           httpGet:

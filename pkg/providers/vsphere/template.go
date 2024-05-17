@@ -354,6 +354,19 @@ func buildTemplateMapCP(
 		values["encryptionProviderConfig"] = conf
 	}
 
+
+	logger.Info("Before if", "KubeletConfiguration", clusterSpec.Cluster.Spec.ControlPlaneConfiguration.KubeletConfiguration)
+
+	if clusterSpec.Cluster.Spec.ControlPlaneConfiguration.KubeletConfiguration != nil {
+		cpKubeletConfig := clusterSpec.Cluster.Spec.ControlPlaneConfiguration.KubeletConfiguration.Object
+
+		kcString, err := yaml.Marshal(cpKubeletConfig)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling %v", err)
+		}
+		values["kubeletConfiguration"] = string(kcString)
+	}
+
 	if clusterSpec.Cluster.Spec.ControlPlaneConfiguration.UpgradeRolloutStrategy != nil {
 		values["upgradeRolloutStrategy"] = true
 		if clusterSpec.Cluster.Spec.ControlPlaneConfiguration.UpgradeRolloutStrategy.Type == anywherev1.InPlaceStrategyType {
