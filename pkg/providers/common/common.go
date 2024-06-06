@@ -114,13 +114,28 @@ func GetCAPIBottlerocketSettingsConfig(config *v1alpha1.BottlerocketConfiguratio
 	b := &v1beta1.BottlerocketSettings{}
 	if config.Kubernetes != nil {
 		b.Kubernetes = &v1beta1.BottlerocketKubernetesSettings{
-			MaxPods: config.Kubernetes.MaxPods,
+			MaxPods:                     config.Kubernetes.MaxPods,
+			ContainerLogMaxFiles:        config.Kubernetes.ContainerLogMaxFiles,
+			ContainerLogMaxSize:         config.Kubernetes.ContainerLogMaxSize,
+			CpuCFSQuota:                 config.Kubernetes.CpuCFSQuota,
+			CpuManagerPolicy:            config.Kubernetes.CpuManagerPolicy,
+			EvictionMaxPodGracePeriod:   config.Kubernetes.EvictionMaxPodGracePeriod,
+			EventBurst:                  config.Kubernetes.EventBurst,
+			EventRecordQPS:              config.Kubernetes.EventRecordQPS,
+			ImageGCHighThresholdPercent: config.Kubernetes.ImageGCHighThresholdPercent,
+			ImageGCLowThresholdPercent:  config.Kubernetes.ImageGCLowThresholdPercent,
+			KubeAPIBurst:                config.Kubernetes.KubeAPIBurst,
+			KubeAPIQPS:                  config.Kubernetes.KubeAPIQPS,
+			PodPidsLimit:                config.Kubernetes.PodPidsLimit,
 		}
 		if len(config.Kubernetes.AllowedUnsafeSysctls) > 0 {
 			b.Kubernetes.AllowedUnsafeSysctls = config.Kubernetes.AllowedUnsafeSysctls
 		}
 		if len(config.Kubernetes.ClusterDNSIPs) > 0 {
 			b.Kubernetes.ClusterDNSIPs = config.Kubernetes.ClusterDNSIPs
+		}
+		if config.Kubernetes.CpuManagerPolicyOptions != nil {
+			b.Kubernetes.CpuManagerPolicyOptions = config.Kubernetes.CpuManagerPolicyOptions
 		}
 	}
 	if config.Kernel != nil {

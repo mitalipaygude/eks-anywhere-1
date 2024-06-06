@@ -109,6 +109,7 @@ func WithApplierWaitForFailureMessage(timeout time.Duration) ApplierOpt {
 func (a Applier) Run(ctx context.Context, spec *cluster.Spec, managementCluster types.Cluster) error {
 	var client kubernetes.Client
 	a.log.V(3).Info("Applying cluster spec")
+	time.Sleep(10 * time.Minute)
 	err := retrier.New(
 		a.applyClusterTimeout,
 		retrier.WithRetryPolicy(retrier.BackOffPolicy(a.retryBackOff)),
