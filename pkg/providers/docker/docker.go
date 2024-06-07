@@ -281,17 +281,6 @@ func buildTemplateMapCP(clusterSpec *cluster.Spec) (map[string]interface{}, erro
 	versionsBundle := clusterSpec.RootVersionsBundle()
 	etcdExtraArgs := clusterapi.SecureEtcdTlsCipherSuitesExtraArgs()
 	sharedExtraArgs := clusterapi.SecureTlsCipherSuitesExtraArgs()
-	kubeletExtraArgs := clusterapi.SecureTlsCipherSuitesExtraArgs().
-		Append(clusterapi.ResolvConfExtraArgs(clusterSpec.Cluster.Spec.ClusterNetwork.DNS.ResolvConf)).
-		Append(clusterapi.ControlPlaneNodeLabelsExtraArgs(clusterSpec.Cluster.Spec.ControlPlaneConfiguration))
-
-	cgroupDriverArgs, err := kubeletCgroupDriverExtraArgs(clusterSpec.Cluster.Spec.KubernetesVersion)
-	if err != nil {
-		return nil, err
-	}
-	if cgroupDriverArgs != nil {
-		kubeletExtraArgs.Append(cgroupDriverArgs)
-	}
 
 	apiServerExtraArgs := clusterapi.OIDCToExtraArgs(clusterSpec.OIDCConfig).
 		Append(clusterapi.AwsIamAuthExtraArgs(clusterSpec.AWSIamConfig)).
@@ -316,7 +305,6 @@ func buildTemplateMapCP(clusterSpec *cluster.Spec) (map[string]interface{}, erro
 		"apiserverExtraArgs":            apiServerExtraArgs.ToPartialYaml(),
 		"controllermanagerExtraArgs":    controllerManagerExtraArgs.ToPartialYaml(),
 		"schedulerExtraArgs":            sharedExtraArgs.ToPartialYaml(),
-		"kubeletExtraArgs":              kubeletExtraArgs.ToPartialYaml(),
 		"externalEtcdVersion":           versionsBundle.KubeDistro.EtcdVersion,
 		"eksaSystemNamespace":           constants.EksaSystemNamespace,
 		"podCidrs":                      clusterSpec.Cluster.Spec.ClusterNetwork.Pods.CidrBlocks,
@@ -367,6 +355,22 @@ func buildTemplateMapCP(clusterSpec *cluster.Spec) (map[string]interface{}, erro
 		}
 
 		values["kubeletConfiguration"] = string(kcString)
+	}
+
+	if clusterSpec.Cluster.Spec.ControlPlaneConfiguration.KubeletConfiguration == nil {
+		kubeletExtraArgs := clusterapi.SecureTlsCipherSuitesExtraArgs().
+			Append(clusterapi.ResolvConfExtraArgs(clusterSpec.Cluster.Spec.ClusterNetwork.DNS.ResolvConf)).
+			Append(clusterapi.ControlPlaneNodeLabelsExtraArgs(clusterSpec.Cluster.Spec.ControlPlaneConfiguration))
+
+		cgroupDriverArgs, err := kubeletCgroupDriverExtraArgs(clusterSpec.Cluster.Spec.KubernetesVersion)
+		if err != nil {
+			return nil, err
+		}
+		if cgroupDriverArgs != nil {
+			kubeletExtraArgs.Append(cgroupDriverArgs)
+		}
+
+		values["kubeletExtraArgs"] = kubeletExtraArgs.ToPartialYaml()
 	}
 
 	return values, nil
