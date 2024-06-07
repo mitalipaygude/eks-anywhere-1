@@ -406,12 +406,14 @@ spec:
 {{- end }}
       nodeRegistration:
         criSocket: /var/run/containerd/containerd.sock
+{{- if not .kubeletConfiguration }}
         kubeletExtraArgs:
           cloud-provider: external
           read-only-port: "0"
           anonymous-auth: "false"
 {{- if .kubeletExtraArgs }}
 {{ .kubeletExtraArgs.ToYaml | indent 10 }}
+{{- end }}
 {{- end }}
         name: '{{`{{ ds.meta_data.hostname }}`}}'
 {{- if .controlPlaneTaints }}
@@ -476,12 +478,14 @@ spec:
 {{- end}}
       nodeRegistration:
         criSocket: /var/run/containerd/containerd.sock
+{{- if not .kubeletConfiguration }}
         kubeletExtraArgs:
           cloud-provider: external
           read-only-port: "0"
           anonymous-auth: "false"
 {{- if .kubeletExtraArgs }}
 {{ .kubeletExtraArgs.ToYaml | indent 10 }}
+{{- end }}
 {{- end }}
         name: '{{`{{ ds.meta_data.hostname }}`}}'
 {{- if .controlPlaneTaints }}

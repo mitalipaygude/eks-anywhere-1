@@ -69,6 +69,7 @@ spec:
 {{- else}}
           taints: []
 {{- end }}
+{{- if not .kubeletConfiguration }}
           kubeletExtraArgs:
             cloud-provider: external
             read-only-port: "0"
@@ -78,6 +79,7 @@ spec:
 {{- end }}
 {{- if .kubeletExtraArgs }}
 {{ .kubeletExtraArgs.ToYaml | indent 12 }}
+{{- end }}
 {{- end }}
           name: '{{"{{"}} ds.meta_data.hostname {{"}}"}}'
 {{- if or (and (ne .format "bottlerocket") (or .proxyConfig .registryMirrorMap)) .kubeletConfiguration }}
