@@ -476,8 +476,8 @@ metadata:
   labels:
     clusterctl.cluster.x-k8s.io/move: "true"
 data:
-  username: bXBheWd1ZGVAYW1hem9uLmNvbQ==
-  password: UmlzaGxwYSQxOTY5
+  username: 
+  password: 
 ---
 apiVersion: v1
 kind: Secret
@@ -506,8 +506,8 @@ stringData:
       name: cloud-provider-vsphere-credentials
       namespace: kube-system
     data:
-      vsphere_server.password: UmlzaGxwYSQxOTY5
-      vsphere_server.username: bXBheWd1ZGVAYW1hem9uLmNvbQ==
+      vsphere_server.password: 
+      vsphere_server.username: 
     type: Opaque
 type: addons.cluster.x-k8s.io/resource-set
 ---
