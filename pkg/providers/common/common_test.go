@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	. "github.com/onsi/gomega"
-	"sigs.k8s.io/cluster-api/bootstrap/kubeadm/api/v1beta1"
+	bootstrapv1 "sigs.k8s.io/cluster-api/bootstrap/kubeadm/api/v1beta1"
 
 	"github.com/aws/eks-anywhere/internal/test"
 	"github.com/aws/eks-anywhere/pkg/api/v1alpha1"
@@ -50,83 +50,98 @@ const (
 func TestGetCAPIBottlerocketSettingsConfig(t *testing.T) {
 	g := NewWithT(t)
 	tests := []struct {
-		name     string
-		config   *v1alpha1.BottlerocketConfiguration
-		expected string
+		name           string
+		config         *v1alpha1.HostOSConfiguration
+		expected       string
+		brKubeSettings *bootstrapv1.BottlerocketKubernetesSettings
 	}{
 		{
-			name:     "nil config",
-			config:   nil,
-			expected: "",
+			name:           "nil config",
+			config:         nil,
+			brKubeSettings: nil,
+			expected:       "",
 		},
 		{
-			name:     "empty config",
-			config:   &v1alpha1.BottlerocketConfiguration{},
-			expected: emptyBottlerocketConfig,
+			name: "empty config",
+			config: &v1alpha1.HostOSConfiguration{
+				BottlerocketConfiguration: &v1alpha1.BottlerocketConfiguration{},
+			},
+			brKubeSettings: nil,
+			expected:       emptyBottlerocketConfig,
 		},
 		{
 			name: "empty kubernetes config",
-			config: &v1alpha1.BottlerocketConfiguration{
-				Kubernetes: &v1beta1.BottlerocketKubernetesSettings{},
+			config: &v1alpha1.HostOSConfiguration{
+				BottlerocketConfiguration: &v1alpha1.BottlerocketConfiguration{},
 			},
-			expected: emptyKubernetesConfig,
+			brKubeSettings: &bootstrapv1.BottlerocketKubernetesSettings{},
+			expected:       emptyKubernetesConfig,
 		},
 		{
 			name: "with allowed unsafe sysctls",
-			config: &v1alpha1.BottlerocketConfiguration{
-				Kubernetes: &v1beta1.BottlerocketKubernetesSettings{
-					AllowedUnsafeSysctls: []string{"foo", "bar"},
-				},
+			config: &v1alpha1.HostOSConfiguration{
+				BottlerocketConfiguration: &v1alpha1.BottlerocketConfiguration{},
+			},
+			brKubeSettings: &bootstrapv1.BottlerocketKubernetesSettings{
+				AllowedUnsafeSysctls: []string{"foo", "bar"},
 			},
 			expected: allowedUnsafeSysctlsConfig,
 		},
 		{
 			name: "with cluster dns IPs",
-			config: &v1alpha1.BottlerocketConfiguration{
-				Kubernetes: &v1beta1.BottlerocketKubernetesSettings{
-					ClusterDNSIPs: []string{"1.2.3.4", "5.6.7.8"},
-				},
+			config: &v1alpha1.HostOSConfiguration{
+				BottlerocketConfiguration: &v1alpha1.BottlerocketConfiguration{},
+			},
+			brKubeSettings: &bootstrapv1.BottlerocketKubernetesSettings{
+				ClusterDNSIPs: []string{"1.2.3.4", "5.6.7.8"},
 			},
 			expected: clusterDNSIPsConfig,
 		},
 		{
 			name: "with max pods",
-			config: &v1alpha1.BottlerocketConfiguration{
-				Kubernetes: &v1beta1.BottlerocketKubernetesSettings{
-					MaxPods: 100,
-				},
+			config: &v1alpha1.HostOSConfiguration{
+				BottlerocketConfiguration: &v1alpha1.BottlerocketConfiguration{},
+			},
+			brKubeSettings: &bootstrapv1.BottlerocketKubernetesSettings{
+				MaxPods: 100,
 			},
 			expected: maxPodsConfig,
 		},
 		{
 			name: "with kernel sysctl config",
-			config: &v1alpha1.BottlerocketConfiguration{
-				Kernel: &v1beta1.BottlerocketKernelSettings{
-					SysctlSettings: map[string]string{
-						"foo": "bar",
-					},
-				},
-			},
-			expected: kernelSysctlConfig,
-		},
-		{
-			name: "with boot kernel parameters",
-			config: &v1alpha1.BottlerocketConfiguration{
-				Boot: &v1beta1.BottlerocketBootSettings{
-					BootKernelParameters: map[string][]string{
-						"foo": {
-							"abc",
-							"def",
+			config: &v1alpha1.HostOSConfiguration{
+				BottlerocketConfiguration: &v1alpha1.BottlerocketConfiguration{
+					Kernel: &bootstrapv1.BottlerocketKernelSettings{
+						SysctlSettings: map[string]string{
+							"foo": "bar",
 						},
 					},
 				},
 			},
-			expected: bootKernelConfig,
+			brKubeSettings: nil,
+			expected:       kernelSysctlConfig,
+		},
+		{
+			name: "with boot kernel parameters",
+			config: &v1alpha1.HostOSConfiguration{
+				BottlerocketConfiguration: &v1alpha1.BottlerocketConfiguration{
+					Boot: &bootstrapv1.BottlerocketBootSettings{
+						BootKernelParameters: map[string][]string{
+							"foo": {
+								"abc",
+								"def",
+							},
+						},
+					},
+				},
+			},
+			brKubeSettings: nil,
+			expected:       bootKernelConfig,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := common.GetCAPIBottlerocketSettingsConfig(tt.config)
+			got, err := common.GetCAPIBottlerocketSettingsConfig(tt.config, tt.brKubeSettings)
 			g.Expect(err).ToNot(HaveOccurred())
 			if got != tt.expected {
 				fmt.Println(got)
