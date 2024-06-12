@@ -107,8 +107,6 @@ func KubeadmConfigTemplateName(clusterName, workerNodeGroupName string, now type
 }
 
 // GetCAPIBottlerocketSettingsConfig returns the formatted CAPI Bottlerocket settings config as a YAML marshaled string.
-//
-//gocyclo:ignore
 func GetCAPIBottlerocketSettingsConfig(config *v1alpha1.HostOSConfiguration, brKubeSettings *bootstrapv1.BottlerocketKubernetesSettings) (string, error) {
 	if config == nil && brKubeSettings == nil {
 		return "", nil
@@ -135,9 +133,12 @@ func GetCAPIBottlerocketSettingsConfig(config *v1alpha1.HostOSConfiguration, brK
 				b.Boot = config.BottlerocketConfiguration.Boot
 			}
 		}
-
 	}
 
+	return getCAPIConfig(b)
+}
+
+func getCAPIConfig(b *bootstrapv1.BottlerocketSettings) (string, error) {
 	brMap := map[string]*bootstrapv1.BottlerocketSettings{
 		"bottlerocket": b,
 	}
