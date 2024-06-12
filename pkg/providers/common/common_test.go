@@ -1,10 +1,12 @@
 package common_test
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
 	. "github.com/onsi/gomega"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	bootstrapv1 "sigs.k8s.io/cluster-api/bootstrap/kubeadm/api/v1beta1"
 
 	"github.com/aws/eks-anywhere/internal/test"
@@ -62,7 +64,13 @@ func TestGetCAPIBottlerocketSettingsConfig(t *testing.T) {
 			expected:       "",
 		},
 		{
-			name: "empty config",
+			name:           "empty config",
+			config:         &v1alpha1.HostOSConfiguration{},
+			brKubeSettings: nil,
+			expected:       "",
+		},
+		{
+			name: "empty BR config",
 			config: &v1alpha1.HostOSConfiguration{
 				BottlerocketConfiguration: &v1alpha1.BottlerocketConfiguration{},
 			},
@@ -207,4 +215,84 @@ func TestGetExternalEtcdReleaseURLWithNilEksaVersion(t *testing.T) {
 	got, err := common.GetExternalEtcdReleaseURL(nil, test.VersionBundle())
 	g.Expect(err).ToNot(HaveOccurred())
 	g.Expect(got).To(BeEmpty())
+}
+
+func TestValidateBottlerocketKC(t *testing.T) {
+	g := NewWithT(t)
+	tests := []struct {
+		name   string
+		subErr error
+		spec   *unstructured.Unstructured
+		br     *bootstrapv1.BottlerocketKubernetesSettings
+	}{
+		{
+			name: "cp config",
+			spec: &unstructured.Unstructured{
+				Object: map[string]interface{}{
+					"kind":       "KubeletConfiguration",
+					"maxPods":    50,
+					"apiVersion": "api",
+				},
+			},
+			subErr: nil,
+		},
+		{
+			name: "worker config",
+			spec: &unstructured.Unstructured{
+				Object: map[string]interface{}{
+					"maxPods": 50,
+					"kind":    "KubeletConfiguration",
+				},
+			},
+			subErr: nil,
+		},
+		{
+			name:   "nil kc config",
+			spec:   nil,
+			subErr: nil,
+		},
+		{
+			name: "invalid cp config",
+			spec: &unstructured.Unstructured{
+				Object: map[string]interface{}{
+					"maxPodss": 50,
+					"kind":     "KubeletConfiguration",
+				},
+			},
+
+			subErr: errors.New("unknown field \"maxPodss\""),
+		},
+		{
+			name: "invalid worker config",
+			spec: &unstructured.Unstructured{
+				Object: map[string]interface{}{
+					"maxPodss": 50,
+					"kind":     "KubeletConfiguration",
+				},
+			},
+
+			subErr: errors.New("unknown field \"maxPodss\""),
+		},
+		{
+			name: "invalid worker config",
+			spec: &unstructured.Unstructured{
+				Object: map[string]interface{}{
+					"staticPodPath": "path",
+					"kind":          "KubeletConfiguration",
+				},
+			},
+
+			subErr: errors.New("unknown field \"staticPodPath\""),
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(_ *testing.T) {
+			_, err := common.ConvertToBottlerocketKubernetesSettings(tc.spec)
+			if tc.subErr == nil {
+				g.Expect(err).ToNot(HaveOccurred())
+			} else {
+				g.Expect(err.Error()).To(ContainSubstring(tc.subErr.Error()))
+			}
+		})
+	}
 }

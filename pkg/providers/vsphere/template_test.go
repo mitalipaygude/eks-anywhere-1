@@ -100,9 +100,10 @@ func TestVsphereTemplateBuilderGenerateCAPISpecControlPlaneValidKubeletConfigCP(
 
 func TestVsphereGenerateCAPISpecControlPlaneValidKubeletConfigCPBR(t *testing.T) {
 	g := NewWithT(t)
-	spec := test.NewFullClusterSpec(t, "testdata/cluster_main.yaml")
+	spec := test.NewFullClusterSpec(t, "testdata/cluster_main_br.yaml")
 	spec.Cluster.Spec.ControlPlaneConfiguration.KubeletConfiguration = &unstructured.Unstructured{
 		Object: map[string]interface{}{
+			"kind":    "KubeletConfiguration",
 			"maxPods": 20,
 		},
 	}
@@ -116,7 +117,7 @@ func TestVsphereGenerateCAPISpecControlPlaneValidKubeletConfigCPBR(t *testing.T)
 		values["controlPlaneTemplateName"] = clusterapi.ControlPlaneMachineTemplateName(spec.Cluster)
 	})
 	g.Expect(err).ToNot(HaveOccurred())
-	test.AssertContentToFile(t, string(data), "testdata/expected_kcp.yaml")
+	test.AssertContentToFile(t, string(data), "testdata/expected_kcp_br.yaml")
 }
 
 func TestTemplateBuilder_CertSANs(t *testing.T) {
